@@ -1,0 +1,39 @@
+version: '3'
+
+networks:
+  docker_network:
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
+
+services:
+  php74:
+    container_name: 'php74'
+    build:  './php74'
+    networks:
+      docker_network:
+        ipv4_address: 192.168.100.2
+    volumes:
+      - '../work/:/data/work/:cached'
+      - './php74/www2.conf:/usr/local/etc/php-fpm.d/www2.conf'
+      - './php74/php.ini:/usr/local/etc/php/php.ini'
+  postgres12:
+    container_name: 'postgres12'
+    image: postgres:12
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: magister
+    ports:
+      - '5432:5432'
+    networks:
+      docker_network:
+        ipv4_address: 192.168.100.3
+    volumes:
+      - '../work/:/data/work/:cached'
+      - 'postgres_docker_volume:/var/lib/postgresql/data'
+
+volumes:
+  postgres_docker_volume:
+
